@@ -1,2 +1,2 @@
-# boot_pken_vote
+# pken-vote
 小松高校アンケートシステム
