@@ -11,10 +11,6 @@ foreach ($slugs as $slug => $field_name) {
     $data[$slug] = get_field($field_name, 40);
 }
 
-$value = $data['fm_form_1']['fm_value'];
-$radio = explode(',', $value);
-
-
 ?>
 
 <h2><?php echo $data['fm_group']['fm_title'] ?></h2>
