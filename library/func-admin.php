@@ -1,4 +1,46 @@
 <?php
+/*----------POST----------*/
+function post_admin_submit(){
+    if($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST["form_type"])){
+		if (!isset($_POST['_wpnonce']) || !wp_verify_nonce($_POST['_wpnonce'], -1)){
+			echo 'セキュリティ警告！<br>もう一度フォーム送信を行ってください';
+			exit;
+		}
+
+		$form_type = $_POST["form_type"];
+		switch($form_type){
+			case 'admin_mig_db':
+				if (!isset($_POST['table']) || !isset($_POST['do'])) {
+					echo 'テーブル名と操作が指定されていません。<br>';
+					exit;
+				}
+				
+				$table = sanitize_text_field($_POST['table']);
+				$do = sanitize_text_field($_POST['do']);
+				
+				if (!in_array($do, ['create', 'delete', 'truncate'])) {
+					echo '無効な操作です。<br>';
+					exit;
+				}
+				
+				if (!mig_db_table($table, $do)) {
+					echo 'データベース操作に失敗しました。<br>';
+					exit;
+				}				
+				
+				break;
+
+			default:
+				break;
+		}
+
+		echo '操作が完了しました。<br>';
+		exit;
+	}
+}
+add_action('_admin_menu', 'post_admin_submit');
+
+
 /*----------base----------*/
 function my_admin_style(){
     wp_enqueue_style( 'my_admin_style', get_stylesheet_directory_uri().'/assets/css/admin.css');
