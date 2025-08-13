@@ -42,7 +42,7 @@ function mig_db_table($table, $do){
         $sql = "TRUNCATE TABLE `$table_name`;";
 
         return $wpdb->query($sql);
-    }    
+    }
 
     return false;
 }
