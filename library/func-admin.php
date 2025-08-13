@@ -1,4 +1,10 @@
 <?php
+/*----------base----------*/
+function my_admin_style(){
+    wp_enqueue_style( 'my_admin_style', get_stylesheet_directory_uri().'/assets/css/admin.css');
+}
+add_action( 'admin_enqueue_scripts', 'my_admin_style' );
+
 /*----------dashbord----------*/
 function remove_dashboard_widget() {
 	remove_action( 'welcome_panel','wp_welcome_panel' ); // ようこそ
