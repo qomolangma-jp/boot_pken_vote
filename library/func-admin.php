@@ -1,4 +1,14 @@
 <?php
+/*----------menu & custom_page----------*/
+function add_my_admin_page(){
+    global $menu;
+
+	//回答のサブページ
+	add_submenu_page('edit.php?post_type=myform', '回答管理', '回答管理', 'edit_published_posts', 'myform_row', function(){print_mypage('myform_row');}, 4);
+
+}
+add_action( 'admin_menu', 'add_my_admin_page');
+
 /*----------POST----------*/
 function post_admin_submit(){
     if($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST["form_type"])){

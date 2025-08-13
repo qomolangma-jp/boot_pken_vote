@@ -1,6 +1,7 @@
 <?php
 //libraryの読み込み
 require_once(get_stylesheet_directory().'/library/func-admin.php');
+require_once(get_stylesheet_directory().'/library/func-data.php');
 require_once(get_stylesheet_directory().'/library/func-mig.php');
 
 
