@@ -1,3 +1,27 @@
+<div class="form-group">
+    <h2>DBマイグレーション</h2>
+    <div class="d-flex gap-2">
+        <form class="form-group d-flex gap-2" action="" method="POST">
+            <button type="submit" class="btn btn-primary btn-sm">テーブル作成</button>
+            <input type="hidden" name="table" value="my_form_reply_history">
+            <input type="hidden" name="do" value="create">
+            <input type="hidden" name="form_type" value="admin_mig_db">
+            <?php wp_nonce_field(); ?>
+        </form>
+
+        <form class="form-group d-flex gap-2" action="" method="POST">
+            <button type="submit" class="btn btn-danger btn-sm">テーブル削除</button>
+            <input type="hidden" name="table" value="my_form_reply_history">
+            <input type="hidden" name="do" value="delete">
+            <input type="hidden" name="form_type" value="admin_mig_db">
+            <?php wp_nonce_field(); ?>
+        </form>
+    </div>
+</div>
+
+<hr class="my-4">
+
+
 <?php
 $slugs = [
     'fm_group' => 'fm_group',
