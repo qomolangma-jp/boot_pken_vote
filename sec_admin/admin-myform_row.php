@@ -1,5 +1,5 @@
 <?php
-$list = data_myform_reply();
+$list = db_myform_reply();
 //print_r($list);
 ?>
 <div id="page-webentry" class="wrp-my_admin wrap">
