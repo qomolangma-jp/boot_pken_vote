@@ -9,6 +9,29 @@ function add_my_admin_page(){
 }
 add_action( 'admin_menu', 'add_my_admin_page');
 
+/*--------アンケート一覧[Admin]--------*/
+function add_myform_columns($columns){
+    $new_columns = array();
+    foreach ( $columns as $column_name => $column_display_name){
+        if ($column_name == 'date'){
+            $new_columns['reply'] = '回答情報';
+        }
+        $new_columns[$column_name] = $column_display_name;
+    }   
+    return $new_columns;
+}
+// カスタム投稿タイプ myformにボタンを追加
+function custom_myform_column($column, $post_id){
+    switch($column){
+        case 'reply':
+			$link = admin_url('edit.php?post_type=myform&page=myform_row&post_id=' . $post_id);
+            echo '<div class=""><a href="'.$link.'" class="btn btn-primary btn-sm">回答者一覧</a></div>';
+        break;
+    }
+}
+add_filter('manage_myform_posts_columns', 'add_myform_columns');
+add_action('manage_myform_posts_custom_column', 'custom_myform_column', 10, 2);
+
 /*----------POST----------*/
 function post_admin_submit(){
     if($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST["form_type"])){

@@ -1,16 +1,45 @@
 <?php
 
-function db_myform_reply($limit=100){
+function db_myform_reply($post_id){
+    //postの詳細
+    $post = get_post($post_id);
+    $slugs = [
+        'fm_group' => 'fm_group',
+        'fm_form_1' => 'fm_form_1',
+        'fm_form_2' => 'fm_form_2',
+        'fm_form_3' => 'fm_form_3', // 追加
+    ];
+
+    $group = [];
+    foreach ($slugs as $slug => $field_name) {
+        $group[$slug] = get_field($field_name, $post_id);
+    }
+
+    //回答の詳細
     $table = 'wp_my_form_reply_history';
-    $select = '*';
-    $col = array();
-    $start = 0; // 0件目から取得
+    $select = 'wp_my_form_reply_history.*, wp_users.display_name';
+    $col = [
+        'post_id' => $post_id,
+    ];
     $order = 'ORDER BY fm_re_id DESC';
-    $join = 'LEFT JOIN wp_users ON wp_users.ID = user_id 
-             LEFT JOIN wp_posts ON wp_posts.ID = post_id';
+    $join = 'LEFT JOIN wp_users ON wp_users.ID = user_id';
+    $limit = 100; // 1ページあたりの件数
+    $start = 0; // 0件目から取得
     $list = db_all($table, $col, $select, $order, $join, $limit, $start);
-    print_r($list);
-    return $list;
+
+
+
+
+    //回答の集計
+    //print_r($list);
+
+    $data = [
+        'post' => $post,
+        'group' => $group,
+        'list' => $list,
+    ];
+
+    return $data;
 }
 
 
