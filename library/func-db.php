@@ -12,13 +12,14 @@ function db_myform_reply($limit=100){
 
 
 $table = 'wp_my_form_reply_history';
-$data = [
-    'user_id' => 1,
-    'post_id' => 40,
-    'answer' => 'YES',
+$tg = [
+    'fm_re_id' => 6,
 ];
-$new_id = db_insert($table, $data);
-echo $new_id;
+$data = [
+    'answer' => 'NO',
+];
+db_update($table, $data, $tg);
+print_r($tg);
 exit;
 
 /*-----------------------UPDATE INSERT DELETE---------------------*/
@@ -28,7 +29,7 @@ function db_insert($table, $data, $format=array()){
     return $wpdb->insert_id;
 }
 
-function db_update($table, $tg, $data, $format=NULL, $tg_format=NULL){
+function db_update($table, $data, $tg, $format=NULL, $tg_format=NULL){
     global $wpdb;
     $wpdb->update($table, $data, $tg, $format, $tg_format);
 }
