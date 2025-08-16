@@ -20,7 +20,10 @@ $list = db_myform_reply();
                 <tbody>
                     <?php foreach ($list as $item): ?>
                         <tr>
-                            <td><?php echo esc_html($item['fm_re_id']); ?></td>
+                            <td>
+                                <?php echo esc_html($item['fm_re_id']); ?>
+                                <a class="btn btn-primary btn-sm" href="<?php echo admin_url('edit.php?post_type=myform&page=myform_row&post_id=' . $item['fm_re_id']); ?>">編集</a>
+                            </td>
                             <td><?php echo esc_html($item['user_id']); ?></td>
                             <td><?php echo esc_html($item['post_id']); ?></td>
                             <td>

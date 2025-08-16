@@ -1,27 +1,24 @@
 <?php
 
 function db_myform_reply($limit=100){
-    global $wpdb;
-    $table = $wpdb->prefix . 'my_form_reply_history';
-    $base = "SELECT * FROM %s";
-    $query = sprintf($base, $table);
-    //echo $query;
-    $list = $wpdb->get_results($query, ARRAY_A);
+    $table = 'wp_my_form_reply_history';
+    $col = array();
+    $start = 0; // 0件目から取得
+    $order = 'ORDER BY fm_re_id DESC';
+    $join = null;
+    $list = db_all($table, $col, $limit, $start, $order, $join);
     return $list;
 }
 
 
-
-
-
-
+/*
 $table = 'wp_my_form_reply_history';
 $col = array(
     'user_id' => 1,
 );
 $limit = 25;
 $start = 0; // 0件目から取得
-$order = 'ORDER BY fm_re_id ASC';
+$order = 'ORDER BY fm_re_id DESC';
 $join = null;
 
 $list = db_all($table, $col, $limit, $start, $order, $join);
@@ -32,7 +29,7 @@ $row = db_row($table, $col, $order, $join);
 print_r($row);
 echo $row['str'];
 echo '<br>';
-exit;
+*/
 
 /*-----------------------SELECT---------------------*/
 function db_all($table, $col, $limit=999, $start=0, $order=NULL, $join=NULL){
