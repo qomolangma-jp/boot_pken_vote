@@ -23,20 +23,21 @@ function db_myform_reply($post_id){
     ];
     $order = 'ORDER BY fm_re_id DESC';
     $join = 'LEFT JOIN wp_users ON wp_users.ID = user_id';
-    $limit = 100; // 1ページあたりの件数
+    $limit = 2000; // 1ページあたりの件数
     $start = 0; // 0件目から取得
     $list = db_all($table, $col, $select, $order, $join, $limit, $start);
 
-
-
-
     //回答の集計
-    //print_r($list);
+    $reply_cc = count($list);
+    if ($reply_cc > 0) {
+
+    }
 
     $data = [
         'post' => $post,
         'group' => $group,
         'list' => $list,
+        'reply_cc' => $reply_cc,
     ];
 
     return $data;

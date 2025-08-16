@@ -4,7 +4,7 @@ $data = db_myform_reply($post_id);
 $post = $data['post'];
 $group = $data['group'];
 $list = $data['list'];
-print_r($data);
+//print_r($data);
 ?>
 
 <?php if(empty($post)): ?>
@@ -45,6 +45,12 @@ print_r($data);
                     <tr>
                         <th>フォームの説明</th>
                         <td><?php echo nl2br($group['fm_group']['fm_text']); ?></td>
+                    </tr>
+                    <tr>
+                        <th>集計データ</th>
+                        <td>
+                            回答数 : <?php echo $data['reply_cc']; ?>
+                        </td>
                     </tr>
 
                 </tbody>
