@@ -2,11 +2,14 @@
 
 function db_myform_reply($limit=100){
     $table = 'wp_my_form_reply_history';
+    $select = '*';
     $col = array();
     $start = 0; // 0件目から取得
     $order = 'ORDER BY fm_re_id DESC';
-    $join = null;
-    $list = db_all($table, $col, $limit, $start, $order, $join);
+    $join = 'LEFT JOIN wp_users ON wp_users.ID = user_id 
+             LEFT JOIN wp_posts ON wp_posts.ID = post_id';
+    $list = db_all($table, $col, $select, $order, $join, $limit, $start);
+    print_r($list);
     return $list;
 }
 
@@ -32,19 +35,19 @@ echo '<br>';
 */
 
 /*-----------------------SELECT---------------------*/
-function db_all($table, $col, $limit=999, $start=0, $order=NULL, $join=NULL){
+function db_all($table, $col, $select='*', $order=NULL, $join=NULL, $limit=999, $start=0){
     global $wpdb;
-    $base = "SELECT * FROM %s %s %s %s %s";
-    $query = sprintf($base, $table, $join, db_where($col), $order, db_limit($limit, $start));
-    
+    $base = "SELECT %s FROM %s %s %s %s %s";
+    $query = sprintf($base, $select, $table, $join, db_where($col), $order, db_limit($limit, $start));
+    echo $query;
     $list = $wpdb->get_results($query, ARRAY_A);
     return $list;
 }
 
-function db_row($table, $col, $order=NULL, $join=NULL){
+function db_row($table, $col, $select='*', $order=NULL, $join=NULL){
     global $wpdb;
-    $base = "SELECT * FROM %s %s %s %s";
-    $query = sprintf($base, $table, $join, db_where($col), $order);
+    $base = "SELECT %s FROM %s %s %s %s";
+    $query = sprintf($base, $select, $table, $join, db_where($col), $order);
     $row = $wpdb->get_row($query, ARRAY_A);
     return $row;
 }

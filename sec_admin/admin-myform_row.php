@@ -2,6 +2,7 @@
 $list = db_myform_reply();
 //print_r($list);
 ?>
+
 <div id="page-webentry" class="wrp-my_admin wrap">
     <h1 class="page-title"><?php echo get_admin_page_title(); ?></h1>
     <div class="page-content">
@@ -11,8 +12,8 @@ $list = db_myform_reply();
                 <thead>
                     <tr>
                         <th>ID</th>
-                        <th>投稿者</th>
-                        <th>質問</th>
+                        <th>回答者 (user_id)</th>
+                        <th>質問 (post_id)</th>
                         <th>回答内容</th>
                         <th>回答日時</th>
                     </tr>
@@ -24,8 +25,14 @@ $list = db_myform_reply();
                                 <?php echo esc_html($item['fm_re_id']); ?>
                                 <a class="btn btn-primary btn-sm" href="<?php echo admin_url('edit.php?post_type=myform&page=myform_row&post_id=' . $item['fm_re_id']); ?>">編集</a>
                             </td>
-                            <td><?php echo esc_html($item['user_id']); ?></td>
-                            <td><?php echo esc_html($item['post_id']); ?></td>
+                            <td>
+                                <?php echo esc_html($item['display_name']); ?>
+                                (<?php echo esc_html($item['user_id']); ?>)
+                            </td>
+                            <td>
+                                <?php echo esc_html($item['post_title']); ?>
+                                (<?php echo esc_html($item['post_id']); ?>)
+                            </td>
                             <td>
                                 <?php echo esc_html($item['answer']); ?>
                                 <br>
