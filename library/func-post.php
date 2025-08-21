@@ -123,3 +123,80 @@ function cur_handle_register( WP_REST_Request $request ) {
         'firstNameKana' => $first_kana,
     ], 201);
 };
+
+
+add_action('rest_api_init', function () {
+    register_rest_route('custom/v1', '/me', [
+        'methods'  => ['GET', 'POST'],
+        'callback' => 'cur_handle_me',
+        'permission_callback' => '__return_true', // 認証不要で外部から叩けるように
+    ]);
+});
+
+function cur_handle_me(WP_REST_Request $request) {
+    // POSTの場合はline_idで検索
+    if ($request->get_method() === 'POST') {
+        $params = $request->get_json_params();
+        $line_id = isset($params['line_id']) ? sanitize_text_field($params['line_id']) : '';
+        if (empty($line_id)) {
+            return new WP_REST_Response(['error' => 'line_id is required'], 400);
+        }
+
+        // line_idでユーザー検索
+        $user_query = new WP_User_Query([
+            'meta_key'   => 'line_user_id',
+            'meta_value' => $line_id,
+            'number'     => 1,
+        ]);
+        $users = $user_query->get_results();
+        if (empty($users)) {
+            return new WP_REST_Response(['error' => 'user not found'], 404);
+        }
+        $user = $users[0];
+        return db_get_member_with_user($user); // ユーザー情報とmember投稿を取得
+    }
+
+    // GETの場合はログインユーザー情報
+    $user = wp_get_current_user();
+    if (!$user || !$user->ID) {
+        return new WP_REST_Response(['error' => 'not_logged_in'], 401);
+    }
+    return db_get_member_with_user($user); // ユーザー情報とmember投稿を取得
+}
+
+add_action('rest_api_init', function () {
+    register_rest_route('custom/v1', '/survey_history', [
+        'methods'  => ['GET'],
+        'callback' => 'cur_handle_survey_history',
+        'permission_callback' => '__return_true',
+    ]);
+});
+
+function cur_handle_survey_history(WP_REST_Request $request) {
+    $user_id = $request->get_param('user_id');
+    if (empty($user_id)) {
+        return new WP_REST_Response(['error' => 'user_id is required'], 400);
+    }
+
+    // post_type = myform で、投稿者が$user_idの投稿を取得
+    $args = [
+        'post_type'      => 'myform',
+        'post_status'    => 'publish',
+        'posts_per_page' => 20,
+        'orderby'        => 'date',
+        'order'          => 'DESC',
+    ];
+    $query = new WP_Query($args);
+
+    $history = [];
+    foreach ($query->posts as $post) {
+        $history[] = [
+            'id'    => $post->ID,
+            'title' => get_the_title($post),
+            'date'  => get_the_date('Y-m-d', $post),
+            // 必要に応じて他のフィールドも追加
+        ];
+    }
+
+    return $history;
+}

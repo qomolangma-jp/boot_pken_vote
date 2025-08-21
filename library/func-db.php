@@ -54,6 +54,46 @@ function db_myform_reply($post_id){
     return $data;
 }
 
+/*-----------------------USER & Member---------------------*/
+function db_get_member_with_user($user){
+    if (!$user || !$user->ID) {
+        return null;
+    }
+
+    // カスタム投稿memberでauthor = user_idの投稿を1件取得
+    $args = [
+        'post_type'      => 'member',
+        'author'         => $user->ID,
+        'post_status'    => 'publish',
+        'posts_per_page' => 1,
+    ];
+    $query = new WP_Query($args);
+    
+    $member_post = null;
+    if ($query->have_posts()) {
+        $member_post = $query->posts[0];
+    }
+
+    $group = get_field('mb_group', $member_post->ID);
+
+    // ユーザー情報とmember投稿を組み合わせて返す
+    $data = [
+        'id'    => $user->ID,
+        'name'  => $user->display_name,
+        'email' => $user->user_email,
+        'member_post' => $member_post,
+        'member_id'   => $member_post ? $member_post->ID : null,
+        // 必要に応じてACFフィールドも追加
+        'grade'       => $member_post ? get_field('mb_group_now_class', $member_post->ID) : null,
+        'last_name'   => $member_post ? get_field('mb_group_name_2nd', $member_post->ID) : null,
+        'first_name'  => $member_post ? get_field('mb_group_name_1st', $member_post->ID) : null,
+        'last_kana'   => $member_post ? get_field('mb_group_kana_2nd', $member_post->ID) : null,
+        'first_kana'  => $member_post ? get_field('mb_group_kana_1st', $member_post->ID) : null,
+    ];
+
+    return $data;
+}
+
 
 /*-----------------------SELECT---------------------*/
 function db_all($table, $col, $select='*', $order=NULL, $join=NULL, $limit=999, $start=0){
