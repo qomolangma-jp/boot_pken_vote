@@ -150,7 +150,7 @@ function cur_handle_me(WP_REST_Request $request) {
         ]);
         $users = $user_query->get_results();
         if (empty($users)) {
-            return new WP_REST_Response(['error' => 'user not found'], 404);
+            return new WP_REST_Response(['error' => 'user not found'], 400);
         }
         $user = $users[0];
         return db_get_member_with_user($user); // ユーザー情報とmember投稿を取得
@@ -198,5 +198,33 @@ function cur_handle_survey_history(WP_REST_Request $request) {
         ];
     }
 
+    return $history;
+}
+
+//*********************************************************
+// アンケート詳細
+//*********************************************************
+add_action('rest_api_init', function () {
+    register_rest_route('custom/v1', '/survey_detail', [
+        'methods'  => ['GET'],
+        'callback' => 'cur_handle_survey_detail',
+        'permission_callback' => '__return_true',
+    ]);
+});
+
+function cur_handle_survey_detail(WP_REST_Request $request) {
+    $user_id = $request->get_param('user_id');
+    $survey_id = $request->get_param('survey_id');
+    
+    if (empty($user_id)) {
+        return new WP_REST_Response(['error' => 'user_id is required'], 400);
+    }
+    $post = get_post($survey_id);
+    $history = [
+        'id'    => $post->ID,
+        'title' => get_the_title($post),
+        'date'  => get_the_date('Y-m-d', $post),
+        // 必要に応じて他のフィールドも追加
+    ];
     return $history;
 }
