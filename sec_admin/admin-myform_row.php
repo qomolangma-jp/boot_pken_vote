@@ -5,6 +5,7 @@ $post = $data['post'];
 $group = $data['group'];
 $forms = $data['form'];
 $list = $data['list'];
+$cc_array = $data['cc_array'];
 //print_r($data);
 ?>
 
@@ -77,7 +78,9 @@ $list = $data['list'];
                     <tr>
                         <th>集計データ</th>
                         <td>
-                            回答数 : <?php echo $data['reply_cc']; ?>
+                            <?php foreach($cc_array as $label => $cc): ?>
+                            <?php echo $label; ?> : <?php echo $cc; ?><br>
+                            <?php endforeach; ?>                            
                         </td>
                     </tr>
 

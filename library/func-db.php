@@ -31,48 +31,35 @@ function db_myform_reply($post_id){
 
     //回答の集計
     $reply_cc = count($list);
-    if ($reply_cc > 0) {
+    $cc_array = [
+        'Total' => $reply_cc,
+    ];
 
+    if ($reply_cc > 0) {
+        foreach($list as $key => $d) {
+            $answer = $d['answer'];
+            $cc_array[$answer] = isset($cc_array[$answer]) ? $cc_array[$answer] + 1 : 1; 
+        }
     }
+    print_r($cc_array);
 
     $data = [
         'post' => $post,
         'group' => $group,
         'form' => $form,
         'list' => $list,
-        'reply_cc' => $reply_cc,
+        'cc_array' => $cc_array,
     ];
 
     return $data;
 }
 
 
-/*
-$table = 'wp_my_form_reply_history';
-$col = array(
-    'user_id' => 1,
-);
-$limit = 25;
-$start = 0; // 0件目から取得
-$order = 'ORDER BY fm_re_id DESC';
-$join = null;
-
-$list = db_all($table, $col, $limit, $start, $order, $join);
-print_r($list);
-echo $list[0]['str'];
-echo '<br>';
-$row = db_row($table, $col, $order, $join);
-print_r($row);
-echo $row['str'];
-echo '<br>';
-*/
-
 /*-----------------------SELECT---------------------*/
 function db_all($table, $col, $select='*', $order=NULL, $join=NULL, $limit=999, $start=0){
     global $wpdb;
     $base = "SELECT %s FROM %s %s %s %s %s";
     $query = sprintf($base, $select, $table, $join, db_where($col), $order, db_limit($limit, $start));
-    echo $query;
     $list = $wpdb->get_results($query, ARRAY_A);
     return $list;
 }
