@@ -3,6 +3,7 @@ $post_id = isset($_GET['post_id']) ? intval($_GET['post_id']) : 0;
 $data = db_myform_reply($post_id);
 $post = $data['post'];
 $group = $data['group'];
+$forms = $data['form'];
 $list = $data['list'];
 //print_r($data);
 ?>
@@ -40,11 +41,38 @@ $list = $data['list'];
                     </tr>
                     <tr>
                         <th>フォームタイトル</th>
-                        <td><?php echo $group['fm_group']['fm_title']; ?></td>
+                        <td><?php echo $group['fm_title']; ?></td>
                     </tr>
                     <tr>
                         <th>フォームの説明</th>
-                        <td><?php echo nl2br($group['fm_group']['fm_text']); ?></td>
+                        <td><?php echo nl2br($group['fm_text']); ?></td>
+                    </tr>
+                    <tr>
+                        <th>回答フォーム</th>
+                        <td>
+    <?php foreach($forms as $form): ?>
+        <?php
+            $options = isset($form['fm_value']) ? explode(',', $form['fm_value']) : [];
+        ?>
+        <div class="form-group">
+            <label for="<?php echo $form_key; ?>"><?php echo $form['fm_label']; ?></label><br>
+            <?php if($form['fm_type'] == 'text'): ?>
+                <input type="text" class="form-control" id="<?php echo $form_key; ?>" name="<?php echo $form_key; ?>" value="">
+            <?php elseif($form['fm_type'] == 'textarea'): ?>
+                <textarea class="form-control" id="<?php echo $form_key; ?>" name="<?php echo $form_key; ?>"></textarea>
+            <?php elseif($form['fm_type'] == 'radio'): ?>
+                <?php foreach($options as $option): ?>
+                    <div class="form-check">
+                        <input class="form-check-input" type="radio" name="<?php echo $form_key; ?>" id="<?php echo $form_key . '_' . esc_attr($option); ?>" value="<?php echo esc_attr($option); ?>">
+                        <label class="form-check-label" for="<?php echo $form_key . '_' . esc_attr($option); ?>">
+                            <?php echo esc_attr($option); ?>
+                        </label>
+                    </div>
+                <?php endforeach; ?>
+            <?php endif; ?>
+        </div>
+    <?php endforeach; ?>                            
+                        </td>                        
                     </tr>
                     <tr>
                         <th>集計データ</th>

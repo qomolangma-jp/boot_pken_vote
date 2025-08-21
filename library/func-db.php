@@ -3,16 +3,18 @@
 function db_myform_reply($post_id){
     //postの詳細
     $post = get_post($post_id);
-    $slugs = [
-        'fm_group' => 'fm_group',
-        'fm_form_1' => 'fm_form_1',
-        'fm_form_2' => 'fm_form_2',
-        'fm_form_3' => 'fm_form_3', // 追加
-    ];
 
-    $group = [];
-    foreach ($slugs as $slug => $field_name) {
-        $group[$slug] = get_field($field_name, $post_id);
+    $group = get_field('fm_group', $post_id);
+    $form = [];
+    $i = 0;
+    while ($i < 3) {
+        $field_name = 'fm_form_' . ($i + 1);
+        $i++;
+        $row = get_field($field_name, $post_id);
+        if (empty($row['fm_label'])) {
+            continue;
+        }
+        $form[] = $row;
     }
 
     //回答の詳細
@@ -36,6 +38,7 @@ function db_myform_reply($post_id){
     $data = [
         'post' => $post,
         'group' => $group,
+        'form' => $form,
         'list' => $list,
         'reply_cc' => $reply_cc,
     ];
