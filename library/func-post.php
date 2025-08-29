@@ -18,9 +18,10 @@ function cur_verify_signature( $raw_body, $signature_header ) {
     return hash_equals($calc, $sig);
 }
 
-/**
- * CORS 設定（ローカル用）
- */
+//*********************************************************
+// API ユーザー
+//*********************************************************
+/*----------登録----------*/
 add_action('rest_api_init', function () {
     register_rest_route('custom/v1', '/register', [
         'methods'  => ['POST', 'OPTIONS'],
@@ -125,6 +126,7 @@ function cur_handle_register( WP_REST_Request $request ) {
 };
 
 
+/*----------ログインチェック----------*/
 add_action('rest_api_init', function () {
     register_rest_route('custom/v1', '/me', [
         'methods'  => ['GET', 'POST'],
@@ -164,6 +166,10 @@ function cur_handle_me(WP_REST_Request $request) {
     return db_get_member_with_user($user); // ユーザー情報とmember投稿を取得
 }
 
+//*********************************************************
+// API アンケート
+//*********************************************************
+/*----------一覧----------*/
 add_action('rest_api_init', function () {
     register_rest_route('custom/v1', '/survey_history', [
         'methods'  => ['GET'],
@@ -201,9 +207,7 @@ function cur_handle_survey_history(WP_REST_Request $request) {
     return $history;
 }
 
-//*********************************************************
-// アンケート詳細
-//*********************************************************
+/*----------詳細----------*/
 add_action('rest_api_init', function () {
     register_rest_route('custom/v1', '/survey_detail', [
         'methods'  => ['GET'],
@@ -215,16 +219,70 @@ add_action('rest_api_init', function () {
 function cur_handle_survey_detail(WP_REST_Request $request) {
     $user_id = $request->get_param('user_id');
     $survey_id = $request->get_param('survey_id');
-    
+
     if (empty($user_id)) {
         return new WP_REST_Response(['error' => 'user_id is required'], 400);
     }
-    $post = get_post($survey_id);
-    $history = [
-        'id'    => $post->ID,
-        'title' => get_the_title($post),
-        'date'  => get_the_date('Y-m-d', $post),
-        // 必要に応じて他のフィールドも追加
-    ];
-    return $history;
+
+    $data = db_myform_data($survey_id);
+    $my_reply = db_myform_reply($user_id, $survey_id);
+    $data['my_reply'] = $my_reply;
+    return $data;
 }
+
+/*----------回答保存----------*/
+add_action('rest_api_init', function () {
+    register_rest_route('custom/v1', '/survey_reply_update', [
+        'methods'  => ['POST', 'OPTIONS'],
+        'callback' => 'cur_handle_survey_reply_update',
+        'permission_callback' => '__return_true', // 外部から叩けるように
+    ]);
+});
+
+function cur_handle_survey_reply_update( WP_REST_Request $request ) {
+
+    // 生のボディと署名を取得
+    $raw = $request->get_body();
+    $sig  = isset($_SERVER['HTTP_X_SIGNATURE']) ? $_SERVER['HTTP_X_SIGNATURE'] : '';
+
+    if ( ! cur_verify_signature($raw, $sig) ) {
+        return new WP_REST_Response(['error' => 'invalid signature'], 401);
+    }
+
+    $data = json_decode($raw, true);
+    if (json_last_error() !== JSON_ERROR_NONE) {
+        return new WP_REST_Response(['error' => 'invalid json'], 400);
+    }
+
+    $post_id = isset($data['post_id']) ? intval($data['post_id']) : 0;
+    $user_id = isset($data['user_id']) ? intval($data['user_id']) : 0;
+
+    if (empty($post_id) || empty($user_id)) {
+        return new WP_REST_Response(['error' => 'post_id and user_id are required'], 422);
+    }
+
+    if ( ! get_post($post_id) ) {
+        return new WP_REST_Response(['error' => 'post not found'], 404);
+    }
+
+    if ( ! get_user_by('ID', $user_id) ) {
+        return new WP_REST_Response(['error' => 'user not found'], 404);
+    }
+
+    $fm_re_id = isset($data['fm_re_id']) ? intval($data['fm_re_id']) : 0;
+    $sql = [
+        'post_id' => $post_id,
+        'user_id' => $user_id,
+        'answer' => isset($data['form_0']) ? sanitize_text_field($data['form_0']) : '',
+        'str' => $raw,
+    ];
+
+    if($fm_re_id) {
+        db_update('wp_my_form_reply_history', $sql, ['fm_re_id' => $fm_re_id]);
+    }else{
+        db_insert('wp_my_form_reply_history', $sql);
+    }
+
+    return new WP_REST_Response(['ok' => true], 201);
+
+};
