@@ -1,11 +1,13 @@
 <?php
 $post_id = isset($_GET['post_id']) ? intval($_GET['post_id']) : 0;
-$data = db_myform_reply($post_id);
+$data = db_myform_data($post_id);
 $post = $data['post'];
 $group = $data['group'];
 $forms = $data['form'];
-$list = $data['list'];
-$cc_array = $data['cc_array'];
+
+$data2 = db_myform_reply_history($post_id);
+$list = $data2['list'];
+$cc_array = $data2['cc_array'];
 //print_r($data);
 ?>
 
