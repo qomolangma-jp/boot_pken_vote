@@ -1,10 +1,10 @@
 <?php
 
-function db_myform_reply($post_id){
+function db_myform_data($post_id){
     //postの詳細
     $post = get_post($post_id);
-
     $group = get_field('fm_group', $post_id);
+
     $form = [];
     $i = 0;
     while ($i < 3) {
@@ -16,6 +16,21 @@ function db_myform_reply($post_id){
         }
         $form[] = $row;
     }
+
+    $data = [
+        'post' => $post,
+        'form' => $form,
+        'group' => $group,
+    ];
+    return $data;
+}
+
+function db_myform_reply($user_id, $post_id){
+    $row = db_row('wp_my_form_reply_history', ['post_id' => $post_id, 'user_id' => $user_id]);
+    return $row;
+}
+
+function db_myform_reply_history($post_id){
 
     //回答の詳細
     $table = 'wp_my_form_reply_history';
@@ -34,25 +49,19 @@ function db_myform_reply($post_id){
     $cc_array = [
         'Total' => $reply_cc,
     ];
-
     if ($reply_cc > 0) {
         foreach($list as $key => $d) {
             $answer = $d['answer'];
             $cc_array[$answer] = isset($cc_array[$answer]) ? $cc_array[$answer] + 1 : 1; 
         }
     }
-    print_r($cc_array);
-
     $data = [
-        'post' => $post,
-        'group' => $group,
-        'form' => $form,
         'list' => $list,
         'cc_array' => $cc_array,
     ];
-
     return $data;
 }
+
 
 /*-----------------------USER & Member---------------------*/
 function db_get_member_with_user($user){
